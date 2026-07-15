@@ -1,0 +1,8 @@
+# Runtime dependencies
+# --------------------
+# rich is OPTIONAL. The tool detects its absence and falls back to plain ASCII
+# output, so `pip install -r requirements.txt` is a nice-to-have, not a
+# prerequisite. Everything else is Python 3.9+ standard library.
+rich>=13.0.0
+
+# Development / testing (install with: pip install -r requirements-dev.txt)

@@ -1,0 +1,111 @@
+# Provenance: this is ORIGINAL prose, written for this project.
+# Do not "improve" it by pasting in text from a book, a website, or any other
+# source -- the repository must remain publishable, and a copyrighted corpus
+# would make it not. If you want a larger corpus, write more, or use a work
+# that is unambiguously in the public domain and say so here.
+#
+# Purpose: the bigram model in analysis/frequency.py is built from this file.
+# Lines beginning with '#' are ignored by the loader.
+# Calibration constants (ENGLISH_FITNESS, RANDOM_FITNESS) were measured on
+# prose HELD OUT of this file -- if you change the corpus, re-measure them.
+A language leaves fingerprints everywhere, and not only in the letters that
+appear most often. English also has strong habits about which letters follow
+which. After a Q there is almost always a U. After a T there is very often an
+H, and the pair TH is one of the most common in the whole language. The letter
+J is rarely followed by anything except a vowel, and the pair ZX does not occur
+in ordinary writing at all. These habits are what a machine can measure.
+
+This file is a small sample of ordinary English prose. The program reads it once
+when it starts and counts how often each pair of letters occurs. Those counts
+become a rough model of the language, and the model is used to judge whether a
+piece of recovered text reads like English or merely looks like English when you
+squint at a bar chart of its letters.
+
+The distinction matters more than it might seem. Suppose you are trying to break
+a message and you allow yourself a great many adjustable settings. With enough
+settings you can always make the letter counts come out looking reasonable, in
+the same way that a tailor with enough pins can make any coat hang straight on
+any person. The coat still will not fit when the person moves. A test that looks
+at pairs of letters is harder to fool, because the pairs run across the seams.
+
+Here then is a stretch of plain writing on no particular subject, chosen only
+because it uses common words in common arrangements.
+
+The morning train was late again, and the platform filled slowly with people who
+had learned not to expect very much from the timetable. An older man read his
+newspaper standing up, turning the pages with one hand. Two students argued
+quietly about a film they had both seen and remembered differently. A woman with
+a large bag of shopping looked down the empty line and sighed, and then looked
+again, as though the second glance might be luckier than the first.
+
+When the train finally arrived it was crowded, and everybody found a way to fit.
+This is a thing people do without being asked. They turn sideways, they lift
+their bags, they make room. Nobody thanks anybody, and yet the whole small
+arrangement works, day after day, in cities all over the world.
+
+Consider now how a house is built. First there is a plan, drawn on paper, and the
+plan is wrong in several places, because every plan is. Then the ground is dug
+and the foundation is poured, and the concrete takes a week to cure while nothing
+appears to happen. The walls go up quickly after that, which is why people who
+watch a building think the early weeks were wasted. They were not. A house with a
+poor foundation will stand for a while and then it will not, and the failure will
+seem sudden even though it was decided long before.
+
+Software is much the same, and so is an argument, and so is a friendship.
+
+Consider the sea. It is not a single thing but a great many things doing
+different work at different depths. The top few feet are bright and warm and
+busy, and almost every picture ever taken of the ocean is a picture of that thin
+layer. Below it the light fails quickly. By a few hundred feet down the colour
+red has gone entirely, and everything that was red appears black or grey. Further
+down still the water is cold and dark and under enormous pressure, and yet it is
+not empty. Animals live there that have never seen the sun, and they make their
+own light instead, in small blue and green sparks that travel a surprising
+distance in water so clear.
+
+Reading is a strange skill when you look at it closely. The marks on this page
+are nothing but shapes, and yet you are not seeing shapes. The words arrive as
+meaning, already unpacked, faster than you could describe how it happens. A child
+learning to read must sound out each letter, slowly and painfully, and then one
+day the sounding out disappears and never comes back. Nobody remembers the day it
+happened to them.
+
+Mathematics has a similar trick in it. A student first learns that adding is
+counting, then that multiplying is repeated adding, then that a great deal of
+what looked like separate rules was really one rule wearing different hats. The
+moment when the rules collapse into one idea feels less like learning and more
+like having been told a secret.
+
+Weather is worth thinking about because it is the plainest example of a system
+that is perfectly understood and still cannot be predicted very far ahead. Every
+rule the air follows is known. Air moves from high pressure toward low pressure,
+warm air rises, water vapour carries heat and releases it when it condenses.
+There is no mystery in any single step. And yet a forecast three days out is
+good, a forecast ten days out is a guess, and a forecast for a month from now is
+not really a forecast at all. Small differences grow. This is not a failure of
+the science but a fact about the world.
+
+A good question is worth more than a good answer, because an answer closes a door
+and a question opens one. Teachers know this and still find it hard to practise,
+since a class that is asking questions is a class that is not moving through the
+material. Every hour spent on a question is an hour not spent on the syllabus.
+The best teachers accept the trade and the worst pretend there is no trade.
+
+Old tools deserve respect even after they stop being useful. A stone axe is not
+a good axe by any modern standard. It is heavy, it is dull, it must be resharpened
+constantly, and a steel axe of the same size will outwork it in every way. But
+somebody thought of it first, and before that nobody had thought of it at all,
+and that first thought is worth more than any improvement made since. The people
+who invented these things were not less clever than we are. They simply had less
+to build on, and they built anyway.
+
+Every craft has its own version of this lesson. The carpenter keeps a hand plane
+in the drawer long after buying the electric one. The cook keeps a knife that was
+old when they were young. These things are not kept for use, or not only for use.
+They are kept because a person who forgets where the work came from will
+eventually make worse work.
+
+Letters, numbers, tools, and habits: all of them are ways of storing what someone
+else already figured out, so that we do not each have to begin at the beginning.
+That is what writing is for, in the end. Somebody worked something out, and wrote
+it down, and now you know it too, and it cost you an afternoon instead of a life.

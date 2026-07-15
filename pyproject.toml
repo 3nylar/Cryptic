@@ -1,0 +1,49 @@
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "cipher-breaker"
+version = "1.0.0"
+description = "Encrypt, decrypt and break Caesar and Vigenere ciphers - and explain how."
+readme = "README.md"
+requires-python = ">=3.9"
+license = { file = "LICENSE" }
+keywords = ["cryptography", "cryptanalysis", "caesar", "vigenere", "education"]
+classifiers = [
+    "Development Status :: 5 - Production/Stable",
+    "Intended Audience :: Education",
+    "License :: OSI Approved :: MIT License",
+    "Programming Language :: Python :: 3",
+    "Topic :: Education",
+    "Topic :: Security :: Cryptography",
+]
+
+# No required dependencies. `rich` is optional; the tool detects its absence and
+# falls back to plain ASCII with the same information. See docs/PLANNING.md 8.3.
+dependencies = []
+
+[project.optional-dependencies]
+color = ["rich>=13.0.0"]
+dev = ["rich>=13.0.0", "pytest>=7.0", "pytest-cov>=4.0"]
+
+[project.scripts]
+cipher-breaker = "cli.args:run"
+
+[tool.setuptools]
+packages = ["cipher", "analysis", "utils", "cli"]
+
+[tool.setuptools.package-data]
+"*" = ["data/*.txt"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+python_files = ["test_*.py"]
+addopts = "-q"
+
+[tool.coverage.run]
+source = ["cipher", "analysis", "utils", "cli"]
+omit = ["*/tests/*"]
+
+[tool.coverage.report]
+exclude_lines = ["pragma: no cover", "if __name__ == .__main__.:", "raise NotImplementedError"]

@@ -1,0 +1,38 @@
+# CI: the design review (PLANNING.md 18) called this out as the top priority.
+# An untested repository is a repository that will be broken in six months with
+# nobody able to say which commit did it.
+name: tests
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  test:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, macos-latest, windows-latest]
+        python-version: ["3.9", "3.12"]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+
+      # The tool must run with NOTHING installed. This job proves it, and it
+      # runs first: if the zero-dependency path breaks, the lecture-theatre
+      # demo breaks, and that is the one use case that cannot be retried.
+      - name: Run with no dependencies at all
+        run: python main.py caesar-break -t "Dwwdfn dw gdzq" --no-color
+
+      - name: Install dev dependencies
+        run: pip install -r requirements-dev.txt
+
+      - name: Tests
+        run: python -m pytest tests -q --cov=cipher --cov=analysis --cov=utils --cov=cli
+
+      - name: Doctests
+        run: python -m pytest --doctest-modules cipher analysis utils -q

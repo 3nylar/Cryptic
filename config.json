@@ -1,0 +1,8 @@
+{
+  "max_key_length": 20,
+  "top_candidates": 5,
+  "no_color": false,
+  "log_level": "WARNING",
+  "log_file": null,
+  "explain": true
+}
