@@ -3,7 +3,7 @@ requires = ["setuptools>=61.0"]
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "cipher-breaker"
+name = "cryptic"
 version = "1.0.0"
 description = "Encrypt, decrypt and break Caesar and Vigenere ciphers - and explain how."
 readme = "README.md"
@@ -28,7 +28,7 @@ color = ["rich>=13.0.0"]
 dev = ["rich>=13.0.0", "pytest>=7.0", "pytest-cov>=4.0"]
 
 [project.scripts]
-cipher-breaker = "cli.args:run"
+cryptic = "cli.args:run"
 
 [tool.setuptools]
 packages = ["cipher", "analysis", "utils", "cli"]

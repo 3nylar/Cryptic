@@ -58,7 +58,7 @@ def _to_markdown(data: dict) -> str:
     lines = [
         f"# Cryptanalysis report - {data['cipher'].title()} cipher",
         "",
-        f"*Generated {stamp} by Cipher Breaker.*",
+        f"*Generated {stamp} by Cryptic.*",
         "",
         "## Result",
         "",

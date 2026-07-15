@@ -9,8 +9,8 @@ For anyone extending, porting or grading this project.
 ## Setup
 
 ```bash
-git clone https://github.com/yourname/cipher-breaker.git
-cd cipher-breaker
+git clone https://github.com/yourname/cryptic.git
+cd cryptic
 python -m venv .venv && source .venv/bin/activate
 pip install -r requirements-dev.txt
 
@@ -35,12 +35,12 @@ cipher/     caesar, vigenere
 utils/      alphabet, formatting, config, export
 ```
 
-| Layer | Owns | Never |
-|---|---|---|
-| `cli/` | prompts, argparse, exit codes, rendering | computes anything |
-| `analysis/` | the attacks, the statistics, the explanations | prints |
-| `cipher/` | encrypt, decrypt, key validation | knows attacks exist |
-| `utils/` | letter maths, rendering, config, export | knows about specific ciphers (except `alphabet.py`, which is the letter maths) |
+| Layer       | Owns                                          | Never                                                                          |
+| ----------- | --------------------------------------------- | ------------------------------------------------------------------------------ |
+| `cli/`      | prompts, argparse, exit codes, rendering      | computes anything                                                              |
+| `analysis/` | the attacks, the statistics, the explanations | prints                                                                         |
+| `cipher/`   | encrypt, decrypt, key validation              | knows attacks exist                                                            |
+| `utils/`    | letter maths, rendering, config, export       | knows about specific ciphers (except `alphabet.py`, which is the letter maths) |
 
 **Why this matters in practice:** because `analysis/` never prints, the same `break_caesar()` serves the CLI, the exporter and the test suite. Because `cli/interactive.py` never computes, the menu is testable by monkeypatching `input()` — no subprocess, no pexpect, 18 tests in 0.4 seconds. Layering is not tidiness; it is what makes the tests cheap enough to actually write.
 
@@ -60,7 +60,7 @@ Three consumers, one object, no duplicated logic.
 
 ### Explanations are generated, not written
 
-`steps[]` is built *during* the attack, quoting the real numbers:
+`steps[]` is built _during_ the attack, quoting the real numbers:
 
 ```python
 steps.append(
@@ -176,18 +176,19 @@ Reuse `analysis/frequency.py` — `chi_squared`, `index_of_coincidence`, `bigram
 
 ## Testing
 
-| File | Level | What |
-|---|---|---|
-| `test_caesar.py`, `test_vigenere.py` | unit | maths, validation, edge cases |
-| `test_frequency.py` | unit + property | statistics, IC invariance, anti-overfitting |
-| `test_breakers.py` | integration + regression | encrypt → break → recover |
-| `test_cli.py` | contract | exit codes, stdout hygiene, export |
-| `test_interactive.py` | contract | the menu, via scripted keystrokes |
-| `test_utils.py` | unit | alphabet, config, export, formatting |
+| File                                 | Level                    | What                                        |
+| ------------------------------------ | ------------------------ | ------------------------------------------- |
+| `test_caesar.py`, `test_vigenere.py` | unit                     | maths, validation, edge cases               |
+| `test_frequency.py`                  | unit + property          | statistics, IC invariance, anti-overfitting |
+| `test_breakers.py`                   | integration + regression | encrypt → break → recover                   |
+| `test_cli.py`                        | contract                 | exit codes, stdout hygiene, export          |
+| `test_interactive.py`                | contract                 | the menu, via scripted keystrokes           |
+| `test_utils.py`                      | unit                     | alphabet, config, export, formatting        |
 
 ### Patterns worth copying
 
 **Parametrise the matrix:**
+
 ```python
 @pytest.mark.parametrize("shift", range(26))
 def test_recovers_every_shift(self, shift):
@@ -195,14 +196,17 @@ def test_recovers_every_shift(self, shift):
 ```
 
 **Test the theory, not just the code:**
+
 ```python
 def test_invariant_under_caesar_shift(self):
     assert math.isclose(index_of_coincidence(ENGLISH),
                         index_of_coincidence(caesar.encrypt(ENGLISH, 13)))
 ```
+
 If that fails, the mathematics is wrong, not the implementation.
 
 **Test the menu without a subprocess:**
+
 ```python
 def script(monkeypatch, answers):
     queue = list(answers)
@@ -220,6 +224,7 @@ def test_bad_key_reprompts_without_losing_text(self, monkeypatch, capsys):
 ```
 
 **Test failure, not only success:**
+
 ```python
 def test_short_text_warns_instead_of_lying(self):
     result = break_vigenere(vigenere.encrypt("hello there", "LEMON"))
@@ -230,7 +235,7 @@ def test_short_text_warns_instead_of_lying(self):
 
 - Coverage ≥ 85% overall, 100% for `cipher/` and `utils/alphabet.py`.
 - Suite under 10 seconds. A slow suite is a suite nobody runs.
-- Assert on *relations* (English scores better than gibberish), not magic numbers — so the corpus can improve without breaking 40 tests.
+- Assert on _relations_ (English scores better than gibberish), not magic numbers — so the corpus can improve without breaking 40 tests.
 
 ---
 
@@ -238,7 +243,7 @@ def test_short_text_warns_instead_of_lying(self):
 
 - **PEP 8**, 88-column soft limit, type hints on public functions.
 - **Google-style docstrings** with an `Examples:` block that runs as a doctest.
-- **Comments explain *why*.** The code already says what.
+- **Comments explain _why_.** The code already says what.
 - Guard clauses over nesting; dataclasses for structured returns; f-strings.
 
 ### The docstring standard

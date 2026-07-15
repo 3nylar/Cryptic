@@ -55,7 +55,7 @@ def main() -> int:
     parser.add_argument("--key", default="LEMONADE", help="Vigenere key to benchmark")
     args = parser.parse_args()
 
-    print(f"Cipher Breaker benchmark  (Python {sys.version.split()[0]})")
+    print(f"Cryptic benchmark  (Python {sys.version.split()[0]})")
     print(f"Vigenere key: {args.key!r} ({len(args.key)} letters)\n")
     header = f"{'letters':>9} | {'C-enc':>8} | {'C-break':>8} | {'V-enc':>8} | {'V-break':>9} | {'V key':>10}"
     print(header)

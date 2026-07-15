@@ -19,12 +19,12 @@ You are running Python 2, or a very old 3.x. Check with `python --version`; you 
 You are running from the wrong directory. `main.py` adds its own folder to the path, so:
 
 ```bash
-cd /path/to/cipher-breaker
+cd /path/to/cryptic
 python main.py                  # works
-python /path/to/cipher-breaker/main.py    # also works
+python /path/to/cryptic/main.py    # also works
 ```
 
-But `python cipher-breaker/main.py` from a parent directory with a *different* `cipher` package installed can confuse imports. `cd` into the project.
+But `python cryptic/main.py` from a parent directory with a _different_ `cipher` package installed can confuse imports. `cd` into the project.
 
 ### `ModuleNotFoundError: No module named 'rich'`
 
@@ -67,16 +67,16 @@ If you want the analysis in a file, use `--export report.md` instead.
 
 Almost always **not enough ciphertext.** These attacks are statistical; statistics need data.
 
-| Cipher | Comfortable | Marginal | Hopeless |
-|---|---|---|---|
-| Caesar | 40+ letters | 20–40 | < 20 |
+| Cipher   | Comfortable                                                              | Marginal         | Hopeless        |
+| -------- | ------------------------------------------------------------------------ | ---------------- | --------------- |
+| Caesar   | 40+ letters                                                              | 20–40            | < 20            |
 | Vigenère | 20+ letters **per key letter** (so 100+ for a 5-letter key, 240+ for 12) | 10–20 per letter | < 10 per letter |
 
 Check the confidence figure. Below ~50% the tool is telling you it's guessing, and it will have said so in a warning. Feed it more text.
 
 ### "Confidence is low even though the plaintext looks right"
 
-Confidence measures two things: how English the result looks, *and* how far ahead it is of the runner-up. A short message can be correct and still score low, because there wasn't enough evidence to rule out the alternatives. The tool is being honest about what it knows, not about what happens to be true.
+Confidence measures two things: how English the result looks, _and_ how far ahead it is of the runner-up. A short message can be correct and still score low, because there wasn't enough evidence to rule out the alternatives. The tool is being honest about what it knows, not about what happens to be true.
 
 ### "It found a 10-letter key but the real one is 5 letters"
 
@@ -90,7 +90,7 @@ python main.py vigenere-break -f secret.txt --key-length 5
 
 ### "The text isn't English"
 
-Then this tool cannot break it. Every constant here — letter frequencies, the IC target of 0.067, the bigram corpus — is English. The *methods* are universal, but the *numbers* are not. Supporting another language means swapping the frequency table and the corpus; see PLANNING.md §16.
+Then this tool cannot break it. Every constant here — letter frequencies, the IC target of 0.067, the bigram corpus — is English. The _methods_ are universal, but the _numbers_ are not. Supporting another language means swapping the frequency table and the corpus; see PLANNING.md §16.
 
 ### "My message has no spaces and it still worked"
 

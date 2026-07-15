@@ -3,8 +3,8 @@
 **Short version:** clone it and run `python main.py`. There is nothing to install.
 
 ```bash
-git clone https://github.com/yourname/cipher-breaker.git
-cd cipher-breaker
+git clone https://github.com/yourname/cryptic.git
+cd cryptic
 python main.py
 ```
 
@@ -14,12 +14,12 @@ If the menu appears, you are done. The rest of this page is for when it doesn't.
 
 ## Requirements
 
-| | Needed | Notes |
-|---|---|---|
-| **Python** | 3.9 or newer | 3.9 is from 2020; anything current works |
-| **Dependencies** | **none** | `rich` is optional and adds colour only |
-| **OS** | any | Linux, macOS, Windows, WSL, Raspberry Pi |
-| **Disk** | ~1 MB | |
+|                  | Needed       | Notes                                    |
+| ---------------- | ------------ | ---------------------------------------- |
+| **Python**       | 3.9 or newer | 3.9 is from 2020; anything current works |
+| **Dependencies** | **none**     | `rich` is optional and adds colour only  |
+| **OS**           | any          | Linux, macOS, Windows, WSL, Raspberry Pi |
+| **Disk**         | ~1 MB        |                                          |
 
 ### Check your Python
 
@@ -53,7 +53,7 @@ pip install -r requirements.txt
 
 ```bash
 pip install -e .
-cipher-breaker --help          # now available from anywhere
+cryptic --help          # now available from anywhere
 ```
 
 `-e` (editable) means your edits take effect immediately, without reinstalling.
@@ -115,7 +115,7 @@ python benchmark.py --sizes 1000   # should take about a second
 
 ## Uninstall
 
-Delete the folder. If you ran `pip install -e .`, also run `pip uninstall cipher-breaker`.
+Delete the folder. If you ran `pip install -e .`, also run `pip uninstall cryptic`.
 
 ---
 

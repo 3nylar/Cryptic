@@ -41,14 +41,14 @@ from analysis.frequency import histogram_rows
 
 BANNER = r"""
 ====================================
-        Cipher Breaker
+        Cryptic
    Caesar & Vigenere Toolkit
 ====================================
 """.strip("\n")
 
 MENU = """\
 ====================================
- Cipher Breaker
+ Cryptic
 ====================================
 1. Encrypt Caesar
 2. Decrypt Caesar

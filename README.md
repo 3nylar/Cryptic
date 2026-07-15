@@ -1,4 +1,4 @@
-# Cipher Breaker
+# Cryptic
 
 **Encrypt and decrypt Caesar and Vigenère ciphers — then break them without the key, and watch the tool explain how.**
 
@@ -22,7 +22,7 @@ Attack at dawn. Bring three ladders and the long rope.
 [OK] Key = 3   confidence [####################] 100%
 ```
 
-Fine — Caesar has 26 keys, that is just brute force. So try the one that was called *unbreakable* for three hundred years, with a **twelve-letter key**:
+Fine — Caesar has 26 keys, that is just brute force. So try the one that was called _unbreakable_ for three hundred years, with a **twelve-letter key**:
 
 ```bash
 $ python main.py vigenere-break -f examples/04_vigenere_cryptography.txt
@@ -32,7 +32,7 @@ The index of coincidence is the probability that two letters drawn at random...
 
 That key has **95,428,956,661,682,176 possibilities** — 9.5 × 10¹⁶. It fell in about **40 milliseconds**, and the tool never tried a second key.
 
-**That gap is the entire point of this project.** Not "the keyspace was too small" — it was enormous. The key *repeated*, and repetition let the attacker take the lock apart one tumbler at a time: 26 × 12 = 312 tests instead of 10¹⁶.
+**That gap is the entire point of this project.** Not "the keyspace was too small" — it was enormous. The key _repeated_, and repetition let the attacker take the lock apart one tumbler at a time: 26 × 12 = 312 tests instead of 10¹⁶.
 
 > **Key size is not security.**
 
@@ -41,8 +41,8 @@ That key has **95,428,956,661,682,176 possibilities** — 9.5 × 10¹⁶. It fel
 ## Install
 
 ```bash
-git clone https://github.com/yourname/cipher-breaker.git
-cd cipher-breaker
+git clone https://github.com/yourname/cryptic.git
+cd cryptic
 python main.py
 ```
 
@@ -62,7 +62,7 @@ python main.py
 
 ```
 ====================================
- Cipher Breaker
+ Cryptic
 ====================================
 1. Encrypt Caesar        4. Encrypt Vigenère      7. Compare Algorithms
 2. Decrypt Caesar        5. Decrypt Vigenère      8. Help
@@ -138,7 +138,7 @@ That example **fails on purpose** and ships in the repo. Cryptanalysis is statis
 
 **Vigenère** — three moves:
 
-1. **Find the key length.** Two independent methods vote: *Kasiski* (repeated ciphertext chunks sit a multiple of the key length apart) and the *index of coincidence* (slice the text every m letters; when m is right, each slice is Caesar-encrypted English and its IC jumps from 0.038 to 0.067).
+1. **Find the key length.** Two independent methods vote: _Kasiski_ (repeated ciphertext chunks sit a multiple of the key length apart) and the _index of coincidence_ (slice the text every m letters; when m is right, each slice is Caesar-encrypted English and its IC jumps from 0.038 to 0.067).
 2. **Split.** With the length known, the message is just m interleaved Caesar ciphers.
 3. **Conquer.** Solve each column separately with chi-squared. Each answer is one key letter.
 
@@ -148,9 +148,9 @@ The maths, properly: [docs/CRYPTOGRAPHY_NOTES.md](docs/CRYPTOGRAPHY_NOTES.md).
 
 The Vigenère breaker originally preferred a **20-letter key over the true 5-letter one** — and by its own scoring, it was right to. A longer key has more free parameters, and more parameters always fit the letter counts better, even when the plaintext is visible garbage. The optimiser had learned to satisfy the scorer instead of doing the job.
 
-The fix was not a bigger penalty; it was a second opinion the optimiser cannot bribe. **Letter pairs** (TH, HE, IN) run *across* the column boundaries, so no choice of per-column shifts can manufacture them.
+The fix was not a bigger penalty; it was a second opinion the optimiser cannot bribe. **Letter pairs** (TH, HE, IN) run _across_ the column boundaries, so no choice of per-column shifts can manufacture them.
 
-The general lesson has nothing to do with cryptography: *when a search optimises a metric, that metric stops being a fair judge of the search.* Written up in [docs/PLANNING.md §10.7](docs/PLANNING.md#107-scoring-algorithms--and-a-bug-worth-keeping).
+The general lesson has nothing to do with cryptography: _when a search optimises a metric, that metric stops being a fair judge of the search._ Written up in [docs/PLANNING.md §10.7](docs/PLANNING.md#107-scoring-algorithms--and-a-bug-worth-keeping).
 
 ---
 
@@ -165,11 +165,11 @@ The general lesson has nothing to do with cryptography: *when a search optimises
 
 Milliseconds, on an ordinary laptop (`python benchmark.py`). For scale: brute-forcing AES-256 at a trillion keys per second would take about **10⁵⁷ years**.
 
-| Cipher | Keyspace | Effective work to break | Status |
-|---|---|---|---|
-| Caesar | 26 | 26 | Broken since the 9th century |
-| Vigenère (m letters) | 26^m | **26 × m** | Broken since 1863 |
-| AES-256 | 1.2 × 10⁷⁷ | 2²⁵⁶ | Unbroken after 25 years of public attack |
+| Cipher               | Keyspace   | Effective work to break | Status                                   |
+| -------------------- | ---------- | ----------------------- | ---------------------------------------- |
+| Caesar               | 26         | 26                      | Broken since the 9th century             |
+| Vigenère (m letters) | 26^m       | **26 × m**              | Broken since 1863                        |
+| AES-256              | 1.2 × 10⁷⁷ | 2²⁵⁶                    | Unbroken after 25 years of public attack |
 
 ---
 
@@ -191,17 +191,17 @@ Dependencies point one way, downward. That is why the test suite can drive the i
 
 ## Documentation
 
-| Document | For |
-|---|---|
-| [INSTALL.md](docs/INSTALL.md) | Getting it running, on any OS |
-| [USER_GUIDE.md](docs/USER_GUIDE.md) | Every command and menu option |
-| [WRITEUP.md](docs/WRITEUP.md) | **The report** — classical crypto, why it fails, vs AES |
-| [CRYPTOGRAPHY_NOTES.md](docs/CRYPTOGRAPHY_NOTES.md) | The mathematics in full |
-| [PLANNING.md](docs/PLANNING.md) | PRD, architecture, design review (19 sections) |
-| [DEVELOPER_GUIDE.md](docs/DEVELOPER_GUIDE.md) | Architecture; how to add a cipher |
-| [API.md](docs/API.md) | Module reference |
-| [SECURITY.md](docs/SECURITY.md) | Why these fail; what to use instead |
-| [TROUBLESHOOTING.md](docs/TROUBLESHOOTING.md) | When something goes wrong |
+| Document                                            | For                                                     |
+| --------------------------------------------------- | ------------------------------------------------------- |
+| [INSTALL.md](docs/INSTALL.md)                       | Getting it running, on any OS                           |
+| [USER_GUIDE.md](docs/USER_GUIDE.md)                 | Every command and menu option                           |
+| [WRITEUP.md](docs/WRITEUP.md)                       | **The report** — classical crypto, why it fails, vs AES |
+| [CRYPTOGRAPHY_NOTES.md](docs/CRYPTOGRAPHY_NOTES.md) | The mathematics in full                                 |
+| [PLANNING.md](docs/PLANNING.md)                     | PRD, architecture, design review (19 sections)          |
+| [DEVELOPER_GUIDE.md](docs/DEVELOPER_GUIDE.md)       | Architecture; how to add a cipher                       |
+| [API.md](docs/API.md)                               | Module reference                                        |
+| [SECURITY.md](docs/SECURITY.md)                     | Why these fail; what to use instead                     |
+| [TROUBLESHOOTING.md](docs/TROUBLESHOOTING.md)       | When something goes wrong                               |
 
 ## Tests
 
@@ -215,7 +215,7 @@ python -m pytest --doctest-modules cipher analysis utils
 
 ## ⚠️ Do not use this for anything real
 
-Every cipher here has been publicly broken for over a century. This tool exists to *demonstrate* that. It is safe to publish precisely because it gives no capability against anything anyone uses.
+Every cipher here has been publicly broken for over a century. This tool exists to _demonstrate_ that. It is safe to publish precisely because it gives no capability against anything anyone uses.
 
 For real encryption, never write your own — use [`cryptography`](https://cryptography.io) (Python), libsodium, or your platform's audited primitives. AES-GCM or ChaCha20-Poly1305, with keys from a proper KDF. See [docs/SECURITY.md](docs/SECURITY.md).
 

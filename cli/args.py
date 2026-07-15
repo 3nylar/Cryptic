@@ -2,7 +2,7 @@
 
 Design rules followed here:
 
-* **Plaintext to stdout, everything else to stderr.** ``cipher-breaker
+* **Plaintext to stdout, everything else to stderr.** ``cryptic
   caesar-encrypt -t hi -k 3 > out.txt`` must yield a file containing only the
   ciphertext, so banners, tables and logs go elsewhere.
 * **Exit codes mean something.** 0 success, 1 user error, 2 argparse usage
@@ -31,16 +31,16 @@ VERSION = "1.0.0"
 def build_parser() -> argparse.ArgumentParser:
     """Construct the full argument parser."""
     parser = argparse.ArgumentParser(
-        prog="cipher-breaker",
+        prog="cryptic",
         description=(
             "Encrypt, decrypt and break Caesar and Vigenere ciphers. "
             "Run with no arguments for the interactive menu."
         ),
         epilog=(
             "Examples:\n"
-            "  cipher-breaker caesar-encrypt -t 'Attack at dawn' -k 3\n"
-            "  cipher-breaker caesar-break -f secret.txt --export report.md\n"
-            "  cat secret.txt | cipher-breaker vigenere-break --max-key-length 12\n"
+            "  cryptic caesar-encrypt -t 'Attack at dawn' -k 3\n"
+            "  cryptic caesar-break -f secret.txt --export report.md\n"
+            "  cat secret.txt | cryptic vigenere-break --max-key-length 12\n"
         ),
         formatter_class=argparse.RawDescriptionHelpFormatter,
     )

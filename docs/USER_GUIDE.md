@@ -8,11 +8,11 @@ Everything the tool does, and when to use which part.
 
 ## Two ways to run it
 
-| | Interactive | Command line |
-|---|---|---|
-| Start with | `python main.py` | `python main.py caesar-break -t "..."` |
-| Good for | learning, demos, one-offs | scripting, marking, pipelines |
-| Input | prompts, one question at a time | flags, files, stdin |
+|            | Interactive                     | Command line                           |
+| ---------- | ------------------------------- | -------------------------------------- |
+| Start with | `python main.py`                | `python main.py caesar-break -t "..."` |
+| Good for   | learning, demos, one-offs       | scripting, marking, pipelines          |
+| Input      | prompts, one question at a time | flags, files, stdin                    |
 
 They do the same work. Beginners should start with the menu.
 
@@ -26,7 +26,7 @@ python main.py
 
 ```
 ====================================
- Cipher Breaker
+ Cryptic
 ====================================
 1. Encrypt Caesar
 2. Decrypt Caesar
@@ -125,34 +125,34 @@ python main.py <command> [options]
 python main.py <command> --help      # every command has its own help
 ```
 
-| Command | Does | Key required |
-|---|---|---|
-| `caesar-encrypt` | Encrypt with a shift | `-k N` |
-| `caesar-decrypt` | Decrypt with a known shift | `-k N` |
-| `caesar-break` | **Recover the shift and plaintext** | no |
-| `vigenere-encrypt` | Encrypt with a keyword | `-k WORD` |
-| `vigenere-decrypt` | Decrypt with a known keyword | `-k WORD` |
-| `vigenere-break` | **Recover the keyword and plaintext** | no |
-| `stats` | Histogram, IC, chi-squared | — |
-| `compare` | Caesar vs Vigenère vs AES | — |
-| `interactive` | Launch the menu | — |
+| Command            | Does                                  | Key required |
+| ------------------ | ------------------------------------- | ------------ |
+| `caesar-encrypt`   | Encrypt with a shift                  | `-k N`       |
+| `caesar-decrypt`   | Decrypt with a known shift            | `-k N`       |
+| `caesar-break`     | **Recover the shift and plaintext**   | no           |
+| `vigenere-encrypt` | Encrypt with a keyword                | `-k WORD`    |
+| `vigenere-decrypt` | Decrypt with a known keyword          | `-k WORD`    |
+| `vigenere-break`   | **Recover the keyword and plaintext** | no           |
+| `stats`            | Histogram, IC, chi-squared            | —            |
+| `compare`          | Caesar vs Vigenère vs AES             | —            |
+| `interactive`      | Launch the menu                       | —            |
 
 ### Options
 
-| Option | Does |
-|---|---|
-| `-t`, `--text TEXT` | Text to process |
-| `-f`, `--file PATH` | Read text from a file (`-` for stdin) |
-| `-k`, `--key KEY` | The key (encrypt/decrypt only) |
-| `--export PATH` | Write a report: `.json`, `.md` or `.txt` |
-| `--no-color` | Plain ASCII output |
-| `--no-explain` | Skip the step-by-step explanation |
-| `--config PATH` | Load settings from a JSON file |
-| `--log-level LEVEL` | `DEBUG` / `INFO` / `WARNING` / `ERROR` (to stderr) |
-| `--top N` | Candidates to show (`caesar-break`) |
-| `--max-key-length N` | Largest key length to try (`vigenere-break`, default 20) |
-| `--key-length N` | Skip estimation; use this length (`vigenere-break`) |
-| `--version`, `--help` | |
+| Option                | Does                                                     |
+| --------------------- | -------------------------------------------------------- |
+| `-t`, `--text TEXT`   | Text to process                                          |
+| `-f`, `--file PATH`   | Read text from a file (`-` for stdin)                    |
+| `-k`, `--key KEY`     | The key (encrypt/decrypt only)                           |
+| `--export PATH`       | Write a report: `.json`, `.md` or `.txt`                 |
+| `--no-color`          | Plain ASCII output                                       |
+| `--no-explain`        | Skip the step-by-step explanation                        |
+| `--config PATH`       | Load settings from a JSON file                           |
+| `--log-level LEVEL`   | `DEBUG` / `INFO` / `WARNING` / `ERROR` (to stderr)       |
+| `--top N`             | Candidates to show (`caesar-break`)                      |
+| `--max-key-length N`  | Largest key length to try (`vigenere-break`, default 20) |
+| `--key-length N`      | Skip estimation; use this length (`vigenere-break`)      |
+| `--version`, `--help` |                                                          |
 
 ### Input: three ways, all equal
 
@@ -164,12 +164,12 @@ cat secret.txt | python main.py caesar-break        # pipe
 
 ### Exit codes
 
-| Code | Means |
-|---|---|
-| `0` | Success |
-| `1` | User error (bad key, missing file) |
-| `2` | Bad usage (argparse) |
-| `130` | Interrupted (Ctrl-C) |
+| Code  | Means                              |
+| ----- | ---------------------------------- |
+| `0`   | Success                            |
+| `1`   | User error (bad key, missing file) |
+| `2`   | Bad usage (argparse)               |
+| `130` | Interrupted (Ctrl-C)               |
 
 ---
 
@@ -189,21 +189,21 @@ Confidence combines **how English the answer looks** with **how far ahead of the
 
 ### The Caesar candidates table
 
-| Column | Means |
-|---|---|
-| **Shift** | The key being tried |
-| **Chi-sq** | Distance from English letter frequencies. **Lower is better.** Real English: 10–40. Wrong shift: 200–2000. |
-| **Score** | Chi-squared, discounted up to 30% if real English words appear |
-| **Plaintext preview** | The first ~50 characters |
+| Column                | Means                                                                                                      |
+| --------------------- | ---------------------------------------------------------------------------------------------------------- |
+| **Shift**             | The key being tried                                                                                        |
+| **Chi-sq**            | Distance from English letter frequencies. **Lower is better.** Real English: 10–40. Wrong shift: 200–2000. |
+| **Score**             | Chi-squared, discounted up to 30% if real English words appear                                             |
+| **Plaintext preview** | The first ~50 characters                                                                                   |
 
 ### The Vigenère key-length table
 
-| Column | Means |
-|---|---|
-| **Length** | Candidate key length `m` |
-| **Avg IC** | Average index of coincidence of the `m` columns. **Near 0.067 = right.** Near 0.038 = wrong. |
-| **Kasiski votes** | How many repeated-chunk distances were divisible by `m` |
-| **Score** | Combined, with a small penalty for longer keys (Occam's razor) |
+| Column            | Means                                                                                        |
+| ----------------- | -------------------------------------------------------------------------------------------- |
+| **Length**        | Candidate key length `m`                                                                     |
+| **Avg IC**        | Average index of coincidence of the `m` columns. **Near 0.067 = right.** Near 0.038 = wrong. |
+| **Kasiski votes** | How many repeated-chunk distances were divisible by `m`                                      |
+| **Score**         | Combined, with a small penalty for longer keys (Occam's razor)                               |
 
 Watch for multiples: if the true key is 5, then 10, 15 and 20 will also score well, because they are the same columns sliced finer. The tool prefers the shortest good fit, which is why it reports 5.
 
@@ -217,18 +217,18 @@ Printed by default; `--no-explain` turns it off. Every number in it is real — 
 
 **These attacks are statistics. Statistics need data.** This is the single thing that determines whether the tool works.
 
-| Cipher | Comfortable | Marginal | Won't work |
-|---|---|---|---|
-| Caesar | 40+ letters | 20–40 | < 20 |
+| Cipher   | Comfortable                    | Marginal         | Won't work      |
+| -------- | ------------------------------ | ---------------- | --------------- |
+| Caesar   | 40+ letters                    | 20–40            | < 20            |
 | Vigenère | **20+ letters per key letter** | 10–20 per letter | < 10 per letter |
 
 So a 5-letter Vigenère key wants **100+ letters**; a 12-letter key wants **240+**.
 
-| Helps | Hurts |
-|---|---|
-| Ordinary English prose | Other languages (every constant here is English) |
-| More text | Lists of names, code, numbers |
-| Natural word frequencies | Deliberately odd text (*Gadsby*, written without any E, defeats the whole method) |
+| Helps                    | Hurts                                                                             |
+| ------------------------ | --------------------------------------------------------------------------------- |
+| Ordinary English prose   | Other languages (every constant here is English)                                  |
+| More text                | Lists of names, code, numbers                                                     |
+| Natural word frequencies | Deliberately odd text (_Gadsby_, written without any E, defeats the whole method) |
 
 **If it fails:** feed it more text; try `--key-length N` if you know it; check the ciphertext really is one of these two ciphers (`stats` will tell you — IC near 0.067 means one alphabet, near 0.038 means many).
 
@@ -241,11 +241,11 @@ python main.py caesar-break -f secret.txt --export report.md
 python main.py vigenere-break -f secret.txt --export results.json
 ```
 
-| Format | Contains | Good for |
-|---|---|---|
+| Format  | Contains                                                          | Good for           |
+| ------- | ----------------------------------------------------------------- | ------------------ |
 | `.json` | key, confidence, timing, plaintext, steps, full candidate ranking | scripting, marking |
-| `.md` | the same, as a formatted report with tables | handing in |
-| `.txt` | key, confidence, plaintext, steps | quick notes |
+| `.md`   | the same, as a formatted report with tables                       | handing in         |
+| `.txt`  | key, confidence, plaintext, steps                                 | quick notes        |
 
 In the menu, every break offers an export path at the end.
 

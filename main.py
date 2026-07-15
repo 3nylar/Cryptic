@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Entry point for the Cipher Breaker CLI.
+"""Entry point for the Cryptic CLI.
 
 Run with no arguments for the interactive menu, or pass a subcommand:
 
