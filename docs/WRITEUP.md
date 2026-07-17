@@ -10,18 +10,34 @@ _Accompanies the Cryptic project. Written for undergraduates meeting cryptograph
 
 Encryption is old. The oldest examples we have are about four thousand years older than the mathematics needed to explain them, and for most of that history the discipline advanced the way cooking did: by people trying things and noticing what worked.
 
-Four words carry the whole subject:
+Four words carry the whole subject, defined the way Paar & Pelzl define them (§1.2.1, p. 5):
 
-- **Plaintext** — the readable message.
-- **Ciphertext** — the scrambled version.
-- **Key** — the secret that turns one into the other.
+- **Plaintext** — the readable message ("x" in the book's notation).
+- **Ciphertext** — the scrambled version ("y").
+- **Key** — the secret that turns one into the other ("k"); the set of all possible keys is the **key space**.
 - **Cipher** — the method itself.
 
-_Encryption_ turns plaintext into ciphertext. _Decryption_ turns it back. The cipher is the recipe; the key is the ingredient only you and your correspondent have.
+_Encryption_ turns plaintext into ciphertext. _Decryption_ turns it back. The cipher is the recipe; the key is the ingredient only you and your correspondent have. The book frames this with three characters this report also uses: Alice sends, Bob receives, and **Oscar** — named, the book notes, "to remind us of the word opponent" (p. 4, fn. 1) — is the attacker listening on the channel between them.
 
-The distinction between the recipe and the ingredient is the most important idea in the field, and it took a surprisingly long time to state clearly. **Kerckhoffs's principle** (1883) says a cipher must remain secure even when the enemy knows exactly how it works — only the key is secret. Everything protecting your bank details today is published, argued over publicly, and attacked by anyone who fancies a go. Secrecy about the _method_ is not security. It is a delay, and a short one.
+The distinction between the recipe and the ingredient is the most important idea in the field, and it took a surprisingly long time to state clearly:
 
-_Classical_ ciphers — the subject of this report — work on letters, and there are two families. **Transposition** ciphers shuffle the letters into a different order. **Substitution** ciphers replace each letter with another. This project concerns two substitution ciphers: Caesar, and Vigenère.
+> "A cryptosystem should be secure even if the attacker (Oscar) knows all details about the system, with the exception of the secret key. In particular, the system should be secure when the attacker knows the encryption and decryption algorithms." — Kerckhoffs's Principle, Def. 1.3.1, p. 10
+
+The book calls this "counterintuitive" (p. 10) — it feels safer to hide the method too — but keeping only the key secret means a leaked key costs nothing to replace, while a leaked _method_, kept secret precisely because it was never tested, tends to fail permanently the moment it's reverse-engineered. The book's example is the DVD content-protection system CSS, "broken easily once it was reverse-engineered" (p. 10).
+
+_Classical_ ciphers — the subject of this report — work on letters, and there are two families. **Transposition** ciphers shuffle the letters into a different order. **Substitution** ciphers replace each letter with another. This project concerns Caesar and Vigenère — both substitution ciphers, and, as the next section shows, Caesar isn't really a separate idea at all: it's the general substitution cipher with its key artificially restricted to a single number.
+
+### The cipher these two are both special cases of
+
+Before naming Caesar, the book teaches the _general_ substitution cipher: any one-to-one relabeling of the 26 letters, not just a shift. Its key space is counted by multiplying: 26 choices for what A becomes, 25 remaining for B, 24 for C, down to 1 for the last letter —
+
+> "key space of the substitution cipher = 26 · 25 ··· 3 · 2 · 1 = 26! ≈ 2⁸⁸" (p. 8)
+
+— roughly 4 × 10²⁶ keys, a number the book itself says would take "several decades" to brute-force even with hundreds of thousands of PCs (p. 8). And it still falls to frequency analysis, because the flaw was never the key count:
+
+> "Good ciphers should hide the statistical properties of the encrypted plaintext... a large key space alone is not sufficient for a strong encryption function." (§1.2.2, "Lesson learned," p. 9)
+
+Caesar is this same cipher with the mapping locked to one shape — "add a constant" — which the book states outright: it is "actually a special case of the substitution cipher" (§1.4.3, p. 18). Shrinking 26! down to 26 keys makes brute force laughably easy on top of an attack that was already working regardless.
 
 ---
 
@@ -91,6 +107,10 @@ Shift | Chi-sq | Plaintext preview
     4 |  412.7 | dl solk wolzl aybaoz av il zlsm lcpkly…
    17 |  489.1 | pr ahwe iaxlx mnkmal mh un lxey xobwxgm…
 ```
+
+The book gives three concrete versions of this technique, not just one (§1.2.2, p. 8): ranking single-letter frequencies (used above), watching for reliable letter-pairs — "in English... the letter Q is almost always followed by a U" — and, if word breaks are visible, spotting short common words like THE and AND outright. This project's frequency toolkit implements all three, not only the first.
+
+It's also worth being precise about which _family_ of attack this is, since the book draws a sharp line: "cryptanalysis can be divided into analytical attacks, which exploit the internal structure of the encryption method, and brute-force attacks, which treat the encryption algorithm as a black box and test all possible keys" (§1.3.1, p. 10). Frequency analysis is squarely the former — it never tries a single key.
 
 The attack needs no dictionary, no guessing and no luck — only about forty letters and some counting. It is _ciphertext-only_: it needs nothing but the encrypted message. That is the weakest thing an attacker can be handed, and it is enough.
 
@@ -213,6 +233,10 @@ That trade never went away. It is the same trade every system makes today, and t
 Which is why the exercise is worth doing rather than reading about. Anyone can be told that a big keyspace is not enough. Encrypting your own message with a twelve-letter key, handing a machine nothing but the ciphertext, and watching your words come back forty milliseconds later is a different kind of knowing — and it is the kind that survives into a career.
 
 ---
+
+### A note on sources
+
+Sections 1–4 (vocabulary, Kerckhoffs, the substitution/Caesar/affine family, and the three frequency techniques) follow Paar & Pelzl, _Understanding Cryptography_, Chapter 1 directly, with page citations given inline. Kasiski's examination, the index of coincidence, and the bigram anti-overfitting model in §5 onward are **not** covered in that book — I checked, and none of those terms appear in it — and are sourced instead from Kasiski (1863) and Friedman (1922) directly, in the same spirit as the assigned chapter but going beyond it.
 
 ### References
 
