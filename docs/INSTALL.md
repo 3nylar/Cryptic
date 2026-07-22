@@ -3,7 +3,7 @@
 **Short version:** clone it and run `python main.py`. There is nothing to install.
 
 ```bash
-git clone https://github.com/yourname/cryptic.git
+git clone https://www.github.com/3nylar/Cryptic.git
 cd cryptic
 python main.py
 ```

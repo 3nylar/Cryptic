@@ -1,0 +1,1544 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Cryptic — how to break Caesar & Vigenère ciphers</title>
+    <meta
+      name="description"
+      content="An interactive, beginner-friendly guide to two classical ciphers — and a working tool that breaks them in your browser. No cryptography knowledge needed."
+    />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      :root {
+        --ink: #0c1017;
+        --ink-2: #121826;
+        --ink-3: #1b2436;
+        --line: #273246;
+        --paper: #e9ebe4;
+        --paper-2: #f3f4ef;
+        --card: #ffffff;
+        --amber: #e0a526;
+        --amber-soft: #f0c868;
+        --brass: #c98a2b;
+        --signal: #e0453a;
+        --teal: #2f9e8f;
+        --tx: #0c1017;
+        --tx-soft: #5a6472;
+        --tx-inv: #e9ebe4;
+        --tx-inv-soft: #95a0b2;
+        --mono:
+          "IBM Plex Mono", "SFMono-Regular", Consolas, "Liberation Mono", Menlo,
+          ui-monospace, monospace;
+        --disp:
+          "Space Grotesk", "Segoe UI", system-ui, -apple-system, sans-serif;
+        --body:
+          "IBM Plex Sans", "Segoe UI", system-ui, -apple-system, sans-serif;
+        --wrap: 1160px;
+      }
+      * {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+      }
+      html {
+        scroll-behavior: smooth;
+      }
+      body {
+        background: var(--paper);
+        color: var(--tx);
+        font-family: var(--body);
+        font-size: 17px;
+        line-height: 1.6;
+        -webkit-font-smoothing: antialiased;
+      }
+      h1,
+      h2,
+      h3 {
+        font-family: var(--disp);
+        font-weight: 700;
+        line-height: 1.08;
+        letter-spacing: -0.02em;
+      }
+      a {
+        color: inherit;
+      }
+      .wrap {
+        max-width: var(--wrap);
+        margin: 0 auto;
+        padding: 0 24px;
+      }
+      .mono {
+        font-family: var(--mono);
+      }
+      .eyebrow {
+        font-family: var(--mono);
+        font-size: 12px;
+        font-weight: 600;
+        letter-spacing: 0.22em;
+        text-transform: uppercase;
+        color: var(--brass);
+      }
+      .section {
+        padding: 96px 0;
+      }
+      .section-dark {
+        background: var(--ink);
+        color: var(--tx-inv);
+      }
+      .section-dark .eyebrow {
+        color: var(--amber);
+      }
+      .lead {
+        font-size: 20px;
+        color: var(--tx-soft);
+        max-width: 62ch;
+      }
+      .section-dark .lead {
+        color: var(--tx-inv-soft);
+      }
+
+      /* nav */
+      .nav {
+        position: sticky;
+        top: 0;
+        z-index: 50;
+        background: rgba(12, 16, 23, 0.9);
+        -webkit-backdrop-filter: blur(10px);
+        backdrop-filter: blur(10px);
+        border-bottom: 1px solid var(--line);
+      }
+      .nav .wrap {
+        display: flex;
+        align-items: center;
+        gap: 28px;
+        height: 60px;
+      }
+      .brand {
+        font-family: var(--mono);
+        font-weight: 600;
+        color: var(--tx-inv);
+        letter-spacing: 0.02em;
+        display: flex;
+        align-items: center;
+        gap: 9px;
+        font-size: 15px;
+      }
+      .brand .dot {
+        width: 9px;
+        height: 9px;
+        background: var(--amber);
+        border-radius: 2px;
+        box-shadow: 0 0 0 3px rgba(224, 165, 38, 0.2);
+      }
+      .nav-links {
+        margin-left: auto;
+        display: flex;
+        gap: 26px;
+        align-items: center;
+      }
+      .nav-links a {
+        font-family: var(--mono);
+        font-size: 13px;
+        color: var(--tx-inv-soft);
+        text-decoration: none;
+        transition: color 0.15s;
+      }
+      .nav-links a:hover {
+        color: var(--amber);
+      }
+      .nav-cta {
+        border: 1px solid var(--line);
+        border-radius: 7px;
+        padding: 7px 13px !important;
+        color: var(--tx-inv) !important;
+      }
+      .nav-cta:hover {
+        border-color: var(--amber);
+        background: rgba(224, 165, 38, 0.08);
+      }
+      @media (max-width: 760px) {
+        .nav-links a:not(.nav-cta) {
+          display: none;
+        }
+      }
+
+      /* buttons */
+      .btn {
+        display: inline-flex;
+        align-items: center;
+        gap: 9px;
+        font-family: var(--mono);
+        font-size: 14px;
+        font-weight: 500;
+        padding: 13px 20px;
+        border-radius: 9px;
+        border: 1px solid transparent;
+        cursor: pointer;
+        text-decoration: none;
+        transition:
+          transform 0.12s,
+          background 0.15s,
+          border-color 0.15s;
+      }
+      .btn:active {
+        transform: translateY(1px);
+      }
+      .btn-primary {
+        background: var(--amber);
+        color: #1a1206;
+        font-weight: 600;
+      }
+      .btn-primary:hover {
+        background: var(--amber-soft);
+      }
+      .btn-ghost {
+        border-color: var(--line);
+        color: var(--tx-inv);
+      }
+      .btn-ghost:hover {
+        border-color: var(--amber);
+        background: rgba(224, 165, 38, 0.08);
+      }
+      .btn-dark {
+        background: var(--ink);
+        color: var(--tx-inv);
+      }
+      .btn-dark:hover {
+        background: var(--ink-3);
+      }
+    </style>
+    <style>
+      /* HERO */
+      .hero {
+        padding: 64px 0 80px;
+        position: relative;
+        overflow: hidden;
+      }
+      .hero::after {
+        content: "";
+        position: absolute;
+        inset: 0;
+        background-image: radial-gradient(
+          circle at 1px 1px,
+          rgba(224, 165, 38, 0.09) 1px,
+          transparent 0
+        );
+        background-size: 26px 26px;
+        pointer-events: none;
+        -webkit-mask-image: linear-gradient(
+          180deg,
+          transparent,
+          #000 30%,
+          #000 70%,
+          transparent
+        );
+        mask-image: linear-gradient(
+          180deg,
+          transparent,
+          #000 30%,
+          #000 70%,
+          transparent
+        );
+      }
+      .hero-grid {
+        display: grid;
+        grid-template-columns: 1.05fr 0.95fr;
+        gap: 56px;
+        align-items: center;
+        position: relative;
+        z-index: 1;
+      }
+      .hero-title {
+        font-size: clamp(34px, 4.6vw, 58px);
+        color: var(--tx-inv);
+        margin: 20px 0 22px;
+      }
+      .hero-title .hl {
+        color: var(--amber);
+      }
+      .hero-lead {
+        margin-bottom: 30px;
+      }
+      .hero-actions {
+        display: flex;
+        gap: 14px;
+        flex-wrap: wrap;
+        margin-bottom: 38px;
+      }
+      .hero-stats {
+        display: flex;
+        gap: 30px;
+        border-top: 1px solid var(--line);
+        padding-top: 26px;
+      }
+      .stat-n {
+        display: block;
+        font-size: 22px;
+        font-weight: 600;
+        color: var(--amber);
+        letter-spacing: -0.01em;
+      }
+      .stat-l {
+        font-size: 13px;
+        color: var(--tx-inv-soft);
+      }
+      .hero-cap {
+        font-size: 12px;
+        color: var(--tx-inv-soft);
+        margin-top: 12px;
+        text-align: center;
+      }
+
+      /* terminal frame */
+      .term-frame {
+        background: #080b11;
+        border: 1px solid var(--line);
+        border-radius: 12px;
+        overflow: hidden;
+        box-shadow: 0 24px 60px -20px rgba(0, 0, 0, 0.7);
+      }
+      .term-bar {
+        display: flex;
+        align-items: center;
+        gap: 7px;
+        padding: 11px 14px;
+        background: #0e131c;
+        border-bottom: 1px solid var(--line);
+      }
+      .tb-dot {
+        width: 11px;
+        height: 11px;
+        border-radius: 50%;
+        background: #2a3446;
+      }
+      .tb-dot:nth-child(1) {
+        background: #e0453a;
+      }
+      .tb-dot:nth-child(2) {
+        background: #e0a526;
+      }
+      .tb-dot:nth-child(3) {
+        background: #2f9e8f;
+      }
+      .tb-name {
+        margin-left: 8px;
+        font-size: 12px;
+        color: var(--tx-inv-soft);
+      }
+      .term-body {
+        padding: 18px 18px 20px;
+        font-size: 13.5px;
+        line-height: 1.7;
+        color: #c5cedc;
+        min-height: 280px;
+        white-space: pre-wrap;
+        word-break: break-word;
+      }
+      .term-body .ok {
+        color: #5fd08b;
+      }
+      .term-body .amber {
+        color: var(--amber-soft);
+      }
+      .term-body .dim {
+        color: #6b7688;
+      }
+      .term-body .warnl {
+        color: #f0a868;
+      }
+      .term-body .sig {
+        color: #f0736a;
+      }
+      .term-body .cmd {
+        color: #fff;
+      }
+      .term-live .term-body {
+        min-height: 340px;
+        max-height: 420px;
+        overflow-y: auto;
+      }
+      .term-input-row {
+        display: flex;
+        align-items: center;
+        gap: 9px;
+        padding: 12px 18px;
+        border-top: 1px solid var(--line);
+        background: #0b0f16;
+      }
+      .prompt {
+        color: var(--amber);
+        font-weight: 600;
+      }
+      .term-input {
+        flex: 1;
+        background: transparent;
+        border: none;
+        outline: none;
+        color: #fff;
+        font-family: var(--mono);
+        font-size: 13.5px;
+      }
+      .term-input::placeholder {
+        color: #4c566a;
+      }
+
+      /* headings */
+      .h2 {
+        font-size: clamp(28px, 3.4vw, 42px);
+        margin-bottom: 18px;
+      }
+      .section-tint {
+        background: var(--paper-2);
+      }
+
+      /* BASICS word cards */
+      .word-grid {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 18px;
+        margin-bottom: 40px;
+      }
+      .word-card {
+        background: var(--card);
+        border: 1px solid #dcddd4;
+        border-radius: 12px;
+        padding: 22px;
+      }
+      .word-card h3 {
+        font-size: 19px;
+        color: var(--brass);
+        margin-bottom: 8px;
+      }
+      .word-card p {
+        font-size: 15px;
+        color: var(--tx-soft);
+        margin-bottom: 16px;
+        min-height: 44px;
+      }
+      .chip {
+        display: inline-block;
+        background: var(--ink);
+        color: var(--amber-soft);
+        font-size: 13px;
+        padding: 7px 12px;
+        border-radius: 7px;
+      }
+      .rule-box {
+        background: var(--ink);
+        color: var(--tx-inv);
+        border-radius: 16px;
+        padding: 38px 40px;
+      }
+      .rule-kick {
+        color: var(--amber);
+        font-size: 12px;
+        letter-spacing: 0.16em;
+        text-transform: uppercase;
+        margin-bottom: 14px;
+      }
+      .rule-main {
+        font-family: var(--disp);
+        font-size: clamp(21px, 2.6vw, 30px);
+        font-weight: 600;
+        line-height: 1.25;
+        margin-bottom: 16px;
+      }
+      .rule-main em {
+        color: var(--amber-soft);
+        font-style: italic;
+      }
+      .rule-sub {
+        color: var(--tx-inv-soft);
+        max-width: 70ch;
+      }
+      .rule-sub em {
+        color: var(--paper);
+        font-style: normal;
+        font-weight: 600;
+      }
+
+      /* two column */
+      .two-col {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 56px;
+        align-items: center;
+      }
+      .plain-list {
+        list-style: none;
+        margin: 24px 0;
+        display: flex;
+        flex-direction: column;
+        gap: 13px;
+      }
+      .plain-list li {
+        padding-left: 26px;
+        position: relative;
+        color: var(--tx-soft);
+      }
+      .plain-list li b {
+        color: var(--tx);
+      }
+      .plain-list li::before {
+        content: "";
+        position: absolute;
+        left: 0;
+        top: 10px;
+        width: 11px;
+        height: 11px;
+        background: var(--amber);
+        border-radius: 3px;
+      }
+      .aside {
+        font-size: 13px;
+        color: var(--tx-soft);
+        border-left: 2px solid var(--brass);
+        padding-left: 14px;
+        margin-top: 22px;
+        line-height: 1.6;
+      }
+      .section-dark .aside {
+        color: var(--tx-inv-soft);
+      }
+
+      /* demo panels */
+      .demo-panel {
+        display: flex;
+        justify-content: center;
+      }
+      .wheel-demo,
+      .vig-demo {
+        background: var(--card);
+        border: 1px solid #dcddd4;
+        border-radius: 16px;
+        padding: 28px;
+        width: 100%;
+        box-shadow: 0 14px 40px -24px rgba(0, 0, 0, 0.3);
+      }
+      .dp-title {
+        font-size: 12px;
+        letter-spacing: 0.14em;
+        text-transform: uppercase;
+        color: var(--tx-soft);
+        margin-bottom: 20px;
+      }
+      .shift-rows {
+        display: flex;
+        flex-direction: column;
+        gap: 7px;
+        margin-bottom: 22px;
+      }
+      .srow {
+        display: flex;
+        gap: 5px;
+        justify-content: center;
+        flex-wrap: wrap;
+      }
+      .sc {
+        width: 30px;
+        height: 36px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-family: var(--mono);
+        font-size: 15px;
+        border-radius: 6px;
+        background: var(--paper-2);
+        color: var(--tx-soft);
+        transition: all 0.2s;
+      }
+      .sc.hot {
+        background: var(--amber);
+        color: #1a1206;
+        font-weight: 600;
+      }
+      .sc.plain {
+        background: var(--ink);
+        color: var(--amber-soft);
+      }
+      .dp-controls {
+        display: flex;
+        align-items: center;
+        gap: 14px;
+        margin-bottom: 20px;
+      }
+      .dp-controls label {
+        font-size: 13px;
+        color: var(--tx-soft);
+      }
+      .dp-controls b {
+        color: var(--brass);
+        font-size: 16px;
+      }
+      .dp-controls input[type="range"] {
+        flex: 1;
+        accent-color: var(--amber);
+      }
+      .dp-result {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 16px;
+        background: var(--paper-2);
+        border-radius: 10px;
+        padding: 16px;
+      }
+      .dp-in {
+        font-size: 20px;
+        color: var(--tx);
+      }
+      .dp-out {
+        font-size: 20px;
+        color: var(--brass);
+        font-weight: 600;
+      }
+      .dp-arrow {
+        color: var(--tx-soft);
+      }
+      .vig-grid {
+        display: grid;
+        grid-template-columns: repeat(6, 1fr);
+        gap: 6px;
+        margin-bottom: 20px;
+      }
+      .vig-grid .vg-lbl {
+        grid-column: 1/-1;
+        font-size: 11px;
+        color: var(--tx-soft);
+        letter-spacing: 0.1em;
+        text-transform: uppercase;
+        margin-top: 6px;
+      }
+      .vig-cell {
+        aspect-ratio: 1;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 6px;
+        font-size: 16px;
+      }
+      .vg-msg {
+        background: var(--ink);
+        color: #fff;
+      }
+      .vg-key {
+        background: var(--paper-2);
+        color: var(--brass);
+        font-weight: 600;
+      }
+      .vg-cip {
+        background: var(--amber);
+        color: #1a1206;
+        font-weight: 600;
+      }
+      .vig-note {
+        font-size: 14px;
+        color: var(--tx-soft);
+      }
+      .vig-note b {
+        color: var(--tx);
+      }
+      .vig-note em {
+        color: var(--brass);
+        font-style: normal;
+        font-weight: 600;
+      }
+      .order-first-desktop {
+        order: -1;
+      }
+
+      /* COMPARE table */
+      .table-scroll {
+        overflow-x: auto;
+        border-radius: 14px;
+        border: 1px solid #dcddd4;
+      }
+      .cmp {
+        width: 100%;
+        border-collapse: collapse;
+        background: var(--card);
+        min-width: 640px;
+      }
+      .cmp th,
+      .cmp td {
+        padding: 15px 18px;
+        text-align: left;
+        border-bottom: 1px solid #e7e8e1;
+        font-size: 15px;
+      }
+      .cmp thead th {
+        font-family: var(--disp);
+        font-size: 16px;
+        background: var(--paper-2);
+      }
+      .cmp .rl {
+        color: var(--tx-soft);
+        font-size: 14px;
+      }
+      .cmp .col-win {
+        background: rgba(47, 158, 143, 0.08);
+      }
+      .cmp thead .col-win {
+        background: rgba(47, 158, 143, 0.14);
+      }
+      .cmp .tag {
+        font-size: 10px;
+        background: var(--teal);
+        color: #fff;
+        padding: 2px 7px;
+        border-radius: 5px;
+        letter-spacing: 0.06em;
+        vertical-align: middle;
+      }
+      .cmp .bad {
+        color: var(--signal);
+        font-weight: 500;
+      }
+      .cmp .good {
+        color: var(--teal);
+        font-weight: 600;
+      }
+      .cmp tbody tr:last-child td {
+        border-bottom: none;
+        font-weight: 600;
+      }
+
+      /* WHY */
+      .why-hero {
+        margin: 36px 0 48px;
+        display: grid;
+        grid-template-columns: auto 1fr;
+        gap: 40px;
+        align-items: center;
+        border-top: 1px solid var(--line);
+        border-bottom: 1px solid var(--line);
+        padding: 34px 0;
+      }
+      .why-eq {
+        display: flex;
+        align-items: center;
+        gap: 20px;
+        flex-wrap: wrap;
+      }
+      .big-num {
+        font-size: clamp(38px, 6vw, 72px);
+        font-weight: 600;
+        color: var(--tx-inv-soft);
+        line-height: 1;
+      }
+      .big-num.win {
+        color: var(--amber);
+      }
+      .why-eq-mid {
+        font-size: 14px;
+        color: var(--tx-inv-soft);
+        line-height: 1.5;
+      }
+      .why-arrow {
+        color: var(--amber);
+        display: block;
+        margin-top: 4px;
+      }
+      .why-because {
+        color: var(--tx-inv-soft);
+        font-size: 17px;
+        max-width: 60ch;
+      }
+      .why-because em {
+        color: var(--paper);
+        font-style: normal;
+        font-weight: 600;
+      }
+      .three-steps {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 22px;
+        margin-bottom: 44px;
+      }
+      .step {
+        background: var(--ink-2);
+        border: 1px solid var(--line);
+        border-radius: 14px;
+        padding: 26px;
+      }
+      .step-n {
+        display: inline-flex;
+        width: 34px;
+        height: 34px;
+        align-items: center;
+        justify-content: center;
+        background: var(--amber);
+        color: #1a1206;
+        border-radius: 9px;
+        font-weight: 600;
+        margin-bottom: 14px;
+      }
+      .step h3 {
+        font-size: 19px;
+        color: var(--tx-inv);
+        margin-bottom: 9px;
+      }
+      .step p {
+        font-size: 14.5px;
+        color: var(--tx-inv-soft);
+      }
+      .step em {
+        color: var(--amber-soft);
+        font-style: normal;
+      }
+      .attack-grid {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 18px;
+        margin-bottom: 44px;
+      }
+      .ak {
+        border: 1px solid var(--line);
+        border-radius: 12px;
+        padding: 22px;
+        background: rgba(224, 165, 38, 0.03);
+      }
+      .ak h4 {
+        color: var(--amber);
+        font-size: 14px;
+        margin-bottom: 9px;
+        letter-spacing: 0.04em;
+      }
+      .ak p {
+        font-size: 14px;
+        color: var(--tx-inv-soft);
+      }
+      .ak em {
+        color: var(--paper);
+        font-style: normal;
+        font-weight: 600;
+      }
+      .why-punch {
+        background: var(--amber);
+        border-radius: 16px;
+        padding: 34px 40px;
+      }
+      .why-punch p {
+        font-family: var(--disp);
+        font-size: clamp(20px, 2.8vw, 30px);
+        font-weight: 700;
+        color: #1a1206;
+        text-align: center;
+        line-height: 1.25;
+      }
+
+      /* TRY */
+      .quick-row {
+        display: flex;
+        gap: 10px;
+        flex-wrap: wrap;
+        align-items: center;
+        margin: 26px 0 20px;
+      }
+      .quick-lbl {
+        font-size: 12px;
+        color: var(--tx-inv-soft);
+        letter-spacing: 0.1em;
+        text-transform: uppercase;
+      }
+      .qbtn {
+        background: var(--ink-3);
+        border: 1px solid var(--line);
+        color: var(--tx-inv);
+        font-size: 13px;
+        padding: 9px 14px;
+        border-radius: 8px;
+        cursor: pointer;
+        transition: all 0.15s;
+      }
+      .qbtn:hover {
+        border-color: var(--amber);
+        background: rgba(224, 165, 38, 0.1);
+        color: var(--amber-soft);
+      }
+
+      /* GET */
+      .code-panel {
+        background: #080b11;
+        border: 1px solid var(--line);
+        border-radius: 14px;
+        overflow: hidden;
+      }
+      .cp-head {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 12px 16px;
+        background: #0e131c;
+        border-bottom: 1px solid var(--line);
+        font-size: 12px;
+        color: var(--tx-inv-soft);
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+      }
+      .copy-btn {
+        background: transparent;
+        border: 1px solid var(--line);
+        color: var(--tx-inv-soft);
+        font-size: 11px;
+        padding: 5px 11px;
+        border-radius: 6px;
+        cursor: pointer;
+        transition: all 0.15s;
+        letter-spacing: 0.06em;
+      }
+      .copy-btn:hover {
+        border-color: var(--amber);
+        color: var(--amber);
+      }
+      .cp-body {
+        padding: 22px 20px;
+        font-size: 13.5px;
+        line-height: 1.85;
+        color: #c5cedc;
+        overflow-x: auto;
+      }
+      .c-cm {
+        color: #5b6675;
+      }
+      .c-url {
+        color: var(--amber-soft);
+      }
+      .get-actions {
+        display: flex;
+        gap: 14px;
+        flex-wrap: wrap;
+        margin-top: 28px;
+      }
+
+      /* FOOTER */
+      .foot {
+        padding: 64px 0 30px;
+      }
+      .foot-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 44px;
+        padding-bottom: 36px;
+        border-bottom: 1px solid var(--line);
+      }
+      .foot-tag {
+        color: var(--tx-inv-soft);
+        font-size: 15px;
+        max-width: 46ch;
+      }
+      .foot-warn {
+        background: rgba(224, 69, 58, 0.08);
+        border: 1px solid rgba(224, 69, 58, 0.3);
+        border-radius: 12px;
+        padding: 22px 24px;
+      }
+      .fw-title {
+        color: #f0736a;
+        font-size: 14px;
+        margin-bottom: 10px;
+      }
+      .foot-warn p {
+        color: var(--tx-inv-soft);
+        font-size: 14px;
+      }
+      .foot-warn em {
+        color: var(--paper);
+        font-style: normal;
+        font-weight: 600;
+      }
+      .foot-bar {
+        display: flex;
+        justify-content: space-between;
+        padding-top: 22px;
+        font-size: 13px;
+        color: var(--tx-inv-soft);
+      }
+      .foot-bar a {
+        color: var(--amber);
+        text-decoration: none;
+      }
+
+      /* responsive */
+      @media (max-width: 900px) {
+        .hero-grid,
+        .two-col,
+        .foot-grid {
+          grid-template-columns: 1fr;
+          gap: 40px;
+        }
+        .word-grid {
+          grid-template-columns: repeat(2, 1fr);
+        }
+        .three-steps,
+        .attack-grid {
+          grid-template-columns: 1fr;
+        }
+        .why-hero {
+          grid-template-columns: 1fr;
+          gap: 24px;
+        }
+        .order-first-desktop {
+          order: 0;
+        }
+        .hero-demo {
+          order: -1;
+        }
+      }
+      @media (max-width: 560px) {
+        .word-grid {
+          grid-template-columns: 1fr;
+        }
+        .section {
+          padding: 64px 0;
+        }
+        .rule-box,
+        .why-punch,
+        .rule-main {
+          padding-left: 24px;
+          padding-right: 24px;
+        }
+      }
+      @media (prefers-reduced-motion: reduce) {
+        * {
+          animation: none !important;
+          transition: none !important;
+          scroll-behavior: auto !important;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <!-- NAV -->
+    <nav class="nav">
+      <div class="wrap">
+        <span class="brand"
+          ><span class="dot"></span>cipher&#8203;-breaker</span
+        >
+        <div class="nav-links">
+          <a href="#basics">Basics</a>
+          <a href="#caesar">Caesar</a>
+          <a href="#vigenere">Vigenère</a>
+          <a href="#compare">Compare</a>
+          <a href="#why">Why it fails</a>
+          <a href="#try">Try it</a>
+          <a class="nav-cta" href="#get">Get the code</a>
+        </div>
+      </div>
+    </nav>
+
+    <!-- HERO -->
+    <header class="hero section-dark">
+      <div class="wrap hero-grid">
+        <div class="hero-copy">
+          <p class="eyebrow">Classical cryptography, made plain</p>
+          <h1 class="hero-title">
+            Watch a code that stood<br />for 300 years fall<br />in
+            <span class="hl" id="heroMs">40 milliseconds</span>.
+          </h1>
+          <p class="lead hero-lead">
+            Two famous ciphers. A message no one gave us the key to. This page
+            explains how they work in plain language — then breaks them, live,
+            in your browser.
+          </p>
+          <div class="hero-actions">
+            <a class="btn btn-primary" href="#try">Try the breaker &#8594;</a>
+            <a class="btn btn-ghost" href="#get"
+              ><svg
+                width="16"
+                height="16"
+                viewBox="0 0 16 16"
+                fill="currentColor"
+              >
+                <path
+                  d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.01 8.01 0 0 0 16 8c0-4.42-3.58-8-8-8z"
+                /></svg
+              >Clone the repo</a
+            >
+          </div>
+          <div class="hero-stats">
+            <div class="stat">
+              <span class="stat-n mono" id="statKeys"
+                >95,428,956,661,682,176</span
+              ><span class="stat-l">possible keys in the message below</span>
+            </div>
+          </div>
+        </div>
+        <div class="hero-demo">
+          <div class="term-frame">
+            <div class="term-bar">
+              <span class="tb-dot"></span><span class="tb-dot"></span
+              ><span class="tb-dot"></span
+              ><span class="tb-name mono">breaking · vigenère</span>
+            </div>
+            <div class="term-body mono" id="heroTerm"></div>
+          </div>
+          <p class="hero-cap mono">
+            A real run. No key was given — only the scrambled text.
+          </p>
+        </div>
+      </div>
+    </header>
+    <!-- BASICS -->
+    <section class="section" id="basics">
+      <div class="wrap">
+        <p class="eyebrow">Start here · no experience needed</p>
+        <h2 class="h2">Four words, and one big idea</h2>
+        <p class="lead" style="margin-bottom: 44px">
+          Imagine passing a note in class. Anyone in between can read it —
+          unless you scramble it first. That scrambling is all a cipher is. Here
+          are the only words you need.
+        </p>
+        <div class="word-grid">
+          <div class="word-card">
+            <h3>Plaintext</h3>
+            <p>Your readable message.</p>
+            <span class="chip mono">HELLO</span>
+          </div>
+          <div class="word-card">
+            <h3>Ciphertext</h3>
+            <p>The scrambled version everyone else sees.</p>
+            <span class="chip mono">KHOOR</span>
+          </div>
+          <div class="word-card">
+            <h3>Key</h3>
+            <p>The secret that turns one into the other.</p>
+            <span class="chip mono">shift by 3</span>
+          </div>
+          <div class="word-card">
+            <h3>Cipher</h3>
+            <p>The method itself — the recipe you both agreed on.</p>
+            <span class="chip mono">move each letter</span>
+          </div>
+        </div>
+        <div class="rule-box">
+          <p class="rule-kick mono">The one rule that runs the whole field</p>
+          <p class="rule-main">
+            The enemy is allowed to know <em>exactly</em> how your cipher works.
+            Only the key is secret.
+          </p>
+          <p class="rule-sub">
+            Every code protecting your bank details is public and published.
+            Hiding the <em>method</em> isn't security — it's a delay. This idea
+            is over 140 years old, and it's why we can hand you a working
+            code-breaker on this page.
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <!-- CAESAR -->
+    <section class="section section-tint" id="caesar">
+      <div class="wrap two-col">
+        <div>
+          <p class="eyebrow">Cipher one · around 50 BC</p>
+          <h2 class="h2">The Caesar cipher:<br />slide every letter</h2>
+          <p class="lead">
+            Pick a number — say 3 — and shift every letter that many places
+            along the alphabet. A becomes D, B becomes E, and Z wraps back
+            around to C. Julius Caesar really used this. To unscramble, you
+            shift back the same 3.
+          </p>
+          <ul class="plain-list">
+            <li><b>The key is just a number</b>, 0 to 25.</li>
+            <li>
+              <b>Same secret both ways</b> — shift forward to hide, back to
+              reveal.
+            </li>
+            <li>
+              <b>Its fatal flaw:</b> there are only 26 possible keys. A computer
+              tries all of them before your finger leaves the key.
+            </li>
+          </ul>
+          <p class="aside mono">
+            Caesar's real protection wasn't the maths — it was that most of his
+            enemies couldn't read.
+          </p>
+        </div>
+        <div class="demo-panel">
+          <div class="wheel-demo">
+            <p class="dp-title mono">Watch the shift</p>
+            <div class="shift-rows" id="caesarViz"></div>
+            <div class="dp-controls">
+              <label class="mono">shift <b id="caesarK">3</b></label>
+              <input
+                type="range"
+                id="caesarSlider"
+                min="0"
+                max="25"
+                value="3"
+              />
+            </div>
+            <div class="dp-result">
+              <span class="mono dp-in" id="caesarIn">HELLO</span
+              ><span class="dp-arrow">&#8594;</span
+              ><span class="mono dp-out" id="caesarOut">KHOOR</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- VIGENERE -->
+    <section class="section" id="vigenere">
+      <div class="wrap two-col">
+        <div class="demo-panel order-first-desktop">
+          <div class="vig-demo">
+            <p class="dp-title mono">The keyword repeats under the message</p>
+            <div class="vig-grid mono" id="vigViz"></div>
+            <p class="vig-note">
+              Both <b>A</b>'s in <span class="mono">ATTACK</span> become
+              <em>different</em> letters — because they sit under different
+              keyword letters. That's what breaks the easy attack.
+            </p>
+          </div>
+        </div>
+        <div>
+          <p class="eyebrow">Cipher two · 1553</p>
+          <h2 class="h2">The Vigenère cipher:<br />a moving shift</h2>
+          <p class="lead">
+            Caesar's weakness is that it shifts <em>everything</em> the same
+            amount. Vigenère fixes that with a keyword. Write the keyword over
+            and over beneath your message, and shift each letter by its own
+            keyword letter instead of one fixed number.
+          </p>
+          <ul class="plain-list">
+            <li>
+              <b>The key is a word</b>, like <span class="mono">LEMON</span> —
+              easy to remember.
+            </li>
+            <li>
+              <b>The same letter hides differently</b> each time, so simple
+              letter-counting fails.
+            </li>
+            <li>
+              <b>For 300 years it was called</b>
+              <em>le chiffre indéchiffrable</em> — "the unbreakable cipher."
+            </li>
+          </ul>
+          <p class="aside mono">
+            A 12-letter keyword has 95 quadrillion possibilities. Hold that
+            thought.
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <!-- COMPARE -->
+    <section class="section section-tint" id="compare">
+      <div class="wrap">
+        <p class="eyebrow">Head to head</p>
+        <h2 class="h2">Caesar vs Vigenère vs modern</h2>
+        <p class="lead" style="margin-bottom: 40px">
+          Both classical ciphers lose. The last column shows what actually
+          protects your data today, and by how far.
+        </p>
+        <div class="table-scroll">
+          <table class="cmp">
+            <thead>
+              <tr>
+                <th></th>
+                <th>Caesar</th>
+                <th>Vigenère</th>
+                <th class="col-win">
+                  AES-256 <span class="mono tag">today</span>
+                </th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td class="rl">Born</td>
+                <td>~50 BC</td>
+                <td>1553</td>
+                <td>2001</td>
+              </tr>
+              <tr>
+                <td class="rl">The key is</td>
+                <td>a number (0–25)</td>
+                <td>a word</td>
+                <td>256 random bits</td>
+              </tr>
+              <tr>
+                <td class="rl">Possible keys</td>
+                <td>26</td>
+                <td>26<sup>length</sup></td>
+                <td class="col-win">1.2 × 10<sup>77</sup></td>
+              </tr>
+              <tr>
+                <td class="rl">Work to actually break it</td>
+                <td class="bad">26 tries</td>
+                <td class="bad">26 × length</td>
+                <td class="col-win good">2<sup>256</sup> — infeasible</td>
+              </tr>
+              <tr>
+                <td class="rl">Hides letter patterns?</td>
+                <td class="bad">No</td>
+                <td class="bad">Only partly</td>
+                <td class="col-win good">Completely</td>
+              </tr>
+              <tr>
+                <td class="rl">Same input, same output?</td>
+                <td class="bad">Always</td>
+                <td class="bad">Always</td>
+                <td class="col-win good">Never</td>
+              </tr>
+              <tr>
+                <td class="rl">Status</td>
+                <td class="bad">Broken (9th c.)</td>
+                <td class="bad">Broken (1863)</td>
+                <td class="col-win good">Unbroken</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <p class="aside mono" style="margin-top: 20px">
+          "Possible keys" and "work to break it" are different columns for a
+          reason. That gap is the entire lesson below.
+        </p>
+      </div>
+    </section>
+
+    <!-- WHY -->
+    <section class="section section-dark" id="why">
+      <div class="wrap">
+        <p class="eyebrow">The punchline</p>
+        <h2 class="h2" style="max-width: 16ch">
+          A giant keyspace is not the same as security
+        </h2>
+        <div class="why-hero">
+          <div class="why-eq">
+            <span class="mono big-num">26¹²</span>
+            <span class="why-eq-mid mono"
+              >= 95,428,956,661,682,176 keys<br /><span class="why-arrow"
+                >but the real work is only</span
+              ></span
+            >
+            <span class="mono big-num win">312</span>
+          </div>
+          <p class="why-because">
+            Because the keyword <em>repeats</em>, a Vigenère message is really
+            just several Caesar ciphers stacked together. The attacker figures
+            out the keyword's length, splits the message into that many simple
+            pieces, and cracks each one on its own. Ninety-five quadrillion
+            becomes three hundred and twelve.
+          </p>
+        </div>
+        <div class="three-steps">
+          <div class="step">
+            <span class="step-n mono">1</span>
+            <h3>Find the length</h3>
+            <p>
+              A statistic called the <em>index of coincidence</em> reveals how
+              long the keyword is — English text has a fingerprint that survives
+              scrambling.
+            </p>
+          </div>
+          <div class="step">
+            <span class="step-n mono">2</span>
+            <h3>Split it up</h3>
+            <p>
+              Once the length is known, the message falls apart into that many
+              separate, simple Caesar ciphers.
+            </p>
+          </div>
+          <div class="step">
+            <span class="step-n mono">3</span>
+            <h3>Crack each piece</h3>
+            <p>
+              Each piece is solved by counting letters — E is the commonest in
+              English, and that never changes. Every answer is one letter of the
+              keyword.
+            </p>
+          </div>
+        </div>
+        <div class="attack-grid">
+          <div class="ak">
+            <h4 class="mono">Ciphertext only</h4>
+            <p>
+              We need <em>nothing</em> but the scrambled text — the weakest
+              thing an attacker can be handed. Both ciphers still fall.
+            </p>
+          </div>
+          <div class="ak">
+            <h4 class="mono">Known words</h4>
+            <p>
+              Guess one word — "the", a date, a greeting — and the key falls
+              out. Real messages are full of predictable words.
+            </p>
+          </div>
+          <div class="ak">
+            <h4 class="mono">Human keys</h4>
+            <p>
+              Keys are words people can remember, so a dictionary beats the
+              giant keyspace. It's still how most passwords fall today.
+            </p>
+          </div>
+        </div>
+        <div class="why-punch">
+          <p>
+            A large keyspace with a repeating pattern inside it is not a large
+            keyspace.
+          </p>
+        </div>
+      </div>
+    </section>
+    <!-- TRY IT -->
+    <section class="section section-dark try-sec" id="try">
+      <div class="wrap">
+        <p class="eyebrow">The tool, running in your browser</p>
+        <h2 class="h2">Try it yourself</h2>
+        <p class="lead">
+          This is the real command-line tool — the same algorithms, ported to
+          run right here. Nothing is sent anywhere; it all happens on your
+          device. Use the quick buttons, or type commands like you would in a
+          terminal.
+        </p>
+
+        <div class="quick-row">
+          <span class="quick-lbl mono">Quick start:</span>
+          <button
+            class="qbtn mono"
+            data-cmd='caesar-break -t "Dwwdfn dw gdzq. Eulqj wkuhh odgghuv."'
+          >
+            Break a Caesar
+          </button>
+          <button
+            class="qbtn mono"
+            data-cmd='vigenere-encrypt -k LEMON -t "Meet me at the old oak tree at midnight"'
+          >
+            Encrypt Vigenère
+          </button>
+          <button class="qbtn mono" data-cmd="demo">
+            Break the 12-letter key
+          </button>
+          <button class="qbtn mono" data-cmd="help">See all commands</button>
+        </div>
+
+        <div class="term-frame term-live">
+          <div class="term-bar">
+            <span class="tb-dot"></span><span class="tb-dot"></span
+            ><span class="tb-dot"></span
+            ><span class="tb-name mono">cryptic — you can type here</span>
+          </div>
+          <div class="term-body mono" id="liveOut"></div>
+          <div class="term-input-row mono">
+            <span class="prompt">$</span>
+            <input
+              type="text"
+              id="liveIn"
+              class="term-input"
+              autocomplete="off"
+              spellcheck="false"
+              placeholder="type a command, or press a button above…"
+              aria-label="terminal command input"
+            />
+          </div>
+        </div>
+        <p class="hero-cap mono" style="margin-top: 14px">
+          Tip: type <b>help</b> for the full command list, or just paste your
+          own scrambled text after <b>caesar-break -t</b>.
+        </p>
+      </div>
+    </section>
+
+    <!-- GET THE CODE -->
+    <section class="section" id="get">
+      <div class="wrap two-col">
+        <div>
+          <p class="eyebrow">Take it with you</p>
+          <h2 class="h2">Run the full toolkit<br />on your own machine</h2>
+          <p class="lead">
+            The browser version above is the real thing, but the full project is
+            a Python command-line app with a menu, file support, exports, tests,
+            and the complete write-up. Clone it and run it in three lines.
+          </p>
+          <div class="get-actions">
+            <a
+              class="btn btn-primary"
+              id="repoBtn"
+              href="#"
+              target="_blank"
+              rel="noopener"
+              ><svg
+                width="16"
+                height="16"
+                viewBox="0 0 16 16"
+                fill="currentColor"
+              >
+                <path
+                  d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.01 8.01 0 0 0 16 8c0-4.42-3.58-8-8-8z"
+                /></svg
+              >View on GitHub</a
+            >
+            <a class="btn btn-dark" href="cryptic.zip" download
+              >Download the .zip</a
+            >
+          </div>
+          <p class="aside mono" style="margin-top: 18px">
+            Set your repo URL once in <b>config.js</b> and every button here
+            points to it.
+          </p>
+        </div>
+        <div class="code-panel">
+          <div class="cp-head mono">
+            <span>clone &amp; run</span
+            ><button class="copy-btn mono" id="copyClone">copy</button>
+          </div>
+          <pre
+            class="cp-body mono"
+            id="cloneBlock"
+          ><span class="c-cm"># 1 — get the code</span>
+git clone <span class="c-url">REPO_HTTPS</span>
+cd cryptic
+
+<span class="c-cm"># 2 — run it (no install needed)</span>
+python main.py
+
+<span class="c-cm"># or run a single command</span>
+python main.py caesar-break -t "Dwwdfn dw gdzq"
+
+<span class="c-cm"># 3 — optional: nicer colours + tests</span>
+pip install -r requirements-dev.txt
+python -m pytest tests -q   <span class="c-cm"># 204 pass</span></pre>
+        </div>
+      </div>
+    </section>
+
+    <!-- FOOTER -->
+    <footer class="foot section-dark">
+      <div class="wrap foot-grid">
+        <div>
+          <p class="brand" style="margin-bottom: 12px">
+            <span class="dot"></span>cryptic
+          </p>
+          <p class="foot-tag">
+            A teaching tool for classical cryptography and the attacks that
+            break it. Built for a university project; free to use, fork and
+            learn from.
+          </p>
+        </div>
+        <div class="foot-warn">
+          <p class="fw-title mono">⚠ Never use these for real secrets</p>
+          <p>
+            Caesar and Vigenère have been broken for over a century. This exists
+            to <em>show</em> that. For real encryption, use a library you didn't
+            write — AES-GCM or ChaCha20-Poly1305.
+          </p>
+        </div>
+      </div>
+      <div class="wrap foot-bar mono">
+        <span>© 2026 · MIT Licensed</span><a href="#get">Get the code →</a>
+      </div>
+    </footer>
+
+    <script src="config.js"></script>
+    <script src="engine.js"></script>
+    <script src="app.js"></script>
+  </body>
+</html>

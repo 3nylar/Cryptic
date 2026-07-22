@@ -41,7 +41,7 @@ That key has **95,428,956,661,682,176 possibilities** — 9.5 × 10¹⁶. It fel
 ## Install
 
 ```bash
-git clone https://github.com/yourname/cryptic.git
+git clone https://www.github.com/3nylar/Cryptic.git
 cd cryptic
 python main.py
 ```
